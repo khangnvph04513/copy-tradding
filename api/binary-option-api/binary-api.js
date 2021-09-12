@@ -18,6 +18,27 @@ fastify.post('/api/v1/bet', async function (request, reply) {
     reply.send({ ok: 'false' });
 });
 
+fastify.get('/api/v1/spot-balance', async function (request, reply) {
+    let token = await dbservice.get();
+    console.log(token);
+    if (token) {
+        let result = await getSpotBlance(token[0].access_token);
+        console.log(result.data);
+        reply.send(result.data);
+        return;
+    }
+    reply.send({ ok: 'false' });
+});
+
+async function getSpotBlance(accessToken) {
+    const options = {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        }
+      };
+    var res = await axios.get('https://pocinex.net/api/wallet/binaryoption/spot-balance', options);
+    return res;
+}
 
 async function callPutOption(accessToken, betType, betAmount, betAccountType) {
     const options = {
